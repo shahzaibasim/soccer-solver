@@ -43,7 +43,7 @@ def load_json_array(filename: str) -> list[dict[str, Any]]:
         )
 
     with path.open("r", encoding="utf-8") as fh:
-        data = json.load(fh)
+        data = json.load(fh, parse_constant=lambda x: 0.0 if x == "NaN" else float(x))
 
     if not isinstance(data, list):
         raise ValueError(
