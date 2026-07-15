@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: soccer_solver_backend
+    build: 
+      context: ./backend
+      dockerfile: .docker/Dockerfile
+    command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./backend:/app
+    ports:
+      - 8000:8000
+    restart: always
+
+  frontend:
+    container_name: soccer_solver_frontend
+    image: node:20
+    working_dir: /app
+    command: bash -c "cd frontend && npm install && npm run dev"
+    volumes:
+      - ./frontend/soccer-solver-backend:/app
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    restart: always
