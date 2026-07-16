@@ -9,9 +9,12 @@ export default defineConfig({
     host: '0.0.0.0', // Expose outside the container
     proxy: {
       '/api': {
-        target: 'http://backend:8000',
+        // Docker: set VITE_API_TARGET=http://backend:8000
+        // Local:  falls back to http://localhost:8000
+        target: process.env.VITE_API_TARGET ?? 'http://localhost:8000',
         changeOrigin: true,
       },
     },
   },
 })
+

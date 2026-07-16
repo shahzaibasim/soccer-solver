@@ -163,8 +163,3 @@ dist-ssr
 
 
 backend/scripts/venv/
-
-backend/app/core/db
-
-backend/app/sneakers
-backend/app/tests
