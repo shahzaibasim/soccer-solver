@@ -292,7 +292,7 @@ def generate_narrative(
 
     return (
         f"{pos_label.capitalize()} {move_phrase}{dest_suffix} have historically "
-        f"{value_direction} within 6–12 months of the move."
+        f"{value_direction} at the first post-transfer valuation update."
         f"{comp_mention}{volume_phrase}"
         f"{caveat}"
     )

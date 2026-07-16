@@ -59,7 +59,8 @@ export function TransitionSimulatorPage() {
 
       <div className="page-body">
         <div className="simulator-grid">
-          {/* ── Left: Input panel ─────────────────────────────────────── */}
+          {/* ── Left: Input panel + methodology ──────────────────────── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card style={{ height: 'fit-content' }}>
             <CardHeader title="Transition Simulator" subtitle="Set a destination and run the model" />
             <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -153,6 +154,19 @@ export function TransitionSimulatorPage() {
             </div>
           </Card>
 
+          {/* Methodology disclosure */}
+          <Card style={{ height: 'fit-content', borderColor: '#c6e9d8', background: 'linear-gradient(135deg, #f9fefb 0%, #f0fbf5 100%)' }}>
+            <div className="card-body" style={{ fontSize: 13, color: '#5c7069', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <p style={{ fontWeight: 700, fontSize: 13, color: '#0f1f1b' }}>How this model works</p>
+              <p><strong style={{ color: '#15803d' }}>Matching:</strong> Comparables are filtered by exact position match, identical tier route (origin → destination), and age within ±5 years. “Similar league” means same competitive tier — not same country or budget.</p>
+              <p><strong style={{ color: '#15803d' }}>Value change window:</strong> The percentage shown is the change between the transfer fee and the first Transfermarkt valuation update after the move. This is not a fixed 6-month or 12-month horizon — the timing depends on when Transfermarkt next updated the player's value.</p>
+              <p><strong style={{ color: '#1d4ed8' }}>What we don’t control for:</strong> Market inflation across years, whether the player actually played regularly post-transfer, injuries, or individual age-curve trajectory. Two players aged 27 are not equivalent if one is ascending and one declining.</p>
+              <p><strong style={{ color: '#92400e' }}>Bias disclosure:</strong> Both positive and negative outcomes are included. The tool does not surface only gains.</p>
+            </div>
+          </Card>
+
+          </div>{/* end left column */}
+
           {/* ── Right: Results panel ───────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Idle state */}
@@ -190,26 +204,36 @@ export function TransitionSimulatorPage() {
             {/* Results */}
             {!simLoading && prediction && (
               <>
-                {/* Value range card */}
-                <Card>
-                  <div className="card-body">
-                    <ValueRangeDisplay
-                      low={prediction.value_range_low_eur}
-                      high={prediction.value_range_high_eur}
-                      current={prediction.current_value_eur}
-                      meanChangePct={prediction.predicted_change_pct_mean}
-                    />
-                    <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' as const }}>
-                      <ConfidenceBadge
-                        level={prediction.confidence_level}
-                        score={prediction.confidence_score}
+                {/* Value range card — hidden when n=0 to avoid misleading €X–€X display */}
+                {prediction.sample_size > 0 ? (
+                  <Card>
+                    <div className="card-body">
+                      <ValueRangeDisplay
+                        low={prediction.value_range_low_eur}
+                        high={prediction.value_range_high_eur}
+                        current={prediction.current_value_eur}
+                        meanChangePct={prediction.predicted_change_pct_mean}
                       />
-                      <span style={{ fontSize: 13, color: '#5c7069' }}>
-                        Based on {prediction.sample_size} comparable transfer{prediction.sample_size !== 1 ? 's' : ''}
-                      </span>
+                      <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' as const }}>
+                        <ConfidenceBadge
+                          level={prediction.confidence_level}
+                          score={prediction.confidence_score}
+                        />
+                        <span style={{ fontSize: 13, color: '#5c7069' }}>
+                          Based on {prediction.sample_size} comparable transfer{prediction.sample_size !== 1 ? 's' : ''}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                ) : (
+                  <Card>
+                    <EmptyState
+                      type="no-results"
+                      title="No comparable precedent found"
+                      body="No historical transfers match this profile (position × tier route × age). Any number shown here would be fabricated. The tool has no basis for a prediction."
+                    />
+                  </Card>
+                )}
 
                 {/* Thin sample warning */}
                 {prediction.thin_sample_warning && (
